@@ -1,4 +1,5 @@
 ﻿using System;
+using DependencyInjectionWorkshop.Models.FailedCounter;
 using DependencyInjectionWorkshop.Models.Hash;
 using DependencyInjectionWorkshop.Models.LogService;
 using DependencyInjectionWorkshop.Models.Notify;
@@ -10,30 +11,30 @@ namespace DependencyInjectionWorkshop.Models
     public class AuthenticationService
     {
         private readonly IProfile _profile;
-        private readonly Sha256Adapter _sha256Adapter;
-        private readonly OtpService _otpService;
-        private readonly SlackAdapter _slackAdapter;
-        private readonly NLogAdapter _nLogAdapter;
-        private readonly FailedCounter.FailedCounter _failedCounter;
+        private readonly IHash _hash;
+        private readonly IOtpService _otpService;
+        private readonly INotify _notify;
+        private readonly ILogger _logger;
+        private readonly IFailedCounter _failedCounter;
 
         public AuthenticationService()
         {
             _profile = new ProfileDbo();
-            _sha256Adapter = new Sha256Adapter();
+            _hash = new Sha256Adapter();
             _otpService = new OtpService();
-            _slackAdapter = new SlackAdapter();
-            _nLogAdapter = new NLogAdapter();
+            _notify = new SlackAdapter();
+            _logger = new NLogAdapter();
             _failedCounter = new FailedCounter.FailedCounter();
         }
 
-        public AuthenticationService(IProfile profileDbo, Sha256Adapter sha256Adapter, OtpService otpService,
-            SlackAdapter slackAdapter, NLogAdapter nLogAdapter, FailedCounter.FailedCounter failedCounter)
+        public AuthenticationService(IProfile profileDbo, IHash hash, IOtpService otpService,
+            INotify notify, ILogger logger, IFailedCounter failedCounter)
         {
             _profile = profileDbo;
-            _sha256Adapter = sha256Adapter;
+            _hash = hash;
             _otpService = otpService;
-            _slackAdapter = slackAdapter;
-            _nLogAdapter = nLogAdapter;
+            _notify = notify;
+            _logger = logger;
             _failedCounter = failedCounter;
         }
 
@@ -47,7 +48,7 @@ namespace DependencyInjectionWorkshop.Models
 
             var passwordfordb = _profile.GetPassword(userAccount);
 
-            string hashedPsw = _sha256Adapter.Hash(password);
+            string hashedPsw = _hash.Hash(password);
 
             var currentOtp = _otpService.GetCurrentOtp(userAccount);
 
@@ -61,9 +62,9 @@ namespace DependencyInjectionWorkshop.Models
                 _failedCounter.AddFailedCount(userAccount);
 
                 var failedCount = _failedCounter.GetFailedCount(userAccount);
-                _nLogAdapter.LogMessage($"accountId:{userAccount} failed times:{failedCount}");
+                _logger.LogMessage($"accountId:{userAccount} failed times:{failedCount}");
 
-                _slackAdapter.Post("Er");
+                _notify.Post("Er");
             }
 
             return false;
