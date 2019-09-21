@@ -40,7 +40,7 @@ namespace DependencyInjectionWorkshop.Models
 
         public bool Verify(string userAccount, string password, string otp)
         {
-            var UserIsLocked = _failedCounter.GetUserLockedStatus(userAccount);
+            var UserIsLocked = _failedCounter.GetAccountIsLocked(userAccount);
             if (UserIsLocked)
             {
                 throw new FailedTooManyTimesException();
@@ -62,9 +62,9 @@ namespace DependencyInjectionWorkshop.Models
                 _failedCounter.AddFailedCount(userAccount);
 
                 var failedCount = _failedCounter.GetFailedCount(userAccount);
-                _logger.LogMessage($"accountId:{userAccount} failed times:{failedCount}");
+                _logger.Info($"accountId:{userAccount} failed times:{failedCount}");
 
-                _notify.Post("Er");
+                _notify.Send("Er");
             }
 
             return false;

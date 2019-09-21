@@ -6,7 +6,7 @@
         {
         }
 
-        public void LogMessage(string s)
+        public void Info(string s)
         {
             var logger = NLog.LogManager.GetCurrentClassLogger();
             logger.Info(s);

@@ -34,7 +34,7 @@ namespace DependencyInjectionWorkshop.Models.FailedCounter
             resetResponse.EnsureSuccessStatusCode();
         }
 
-        public bool GetUserLockedStatus(string userAccount)
+        public bool GetAccountIsLocked(string userAccount)
         {
             var isLockedResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/IsLocked", userAccount).Result;
 

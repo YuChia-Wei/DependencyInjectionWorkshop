@@ -8,7 +8,7 @@ namespace DependencyInjectionWorkshop.Models.Notify
         {
         }
 
-        public void Post(string messageText)
+        public void Send(string messageText)
         {
             var slackClient = new SlackClient("my api token");
             slackClient.PostMessage(response1 => { }, "my channel", messageText, "my bot name");
