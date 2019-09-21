@@ -123,6 +123,15 @@ namespace DependencyInjectionWorkshop.Models
 
             resetResponse.EnsureSuccessStatusCode();
         }
+
+        public bool GetUserLockedStatus(string userAccount)
+        {
+            var isLockedResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/IsLocked", userAccount).Result;
+
+            isLockedResponse.EnsureSuccessStatusCode();
+            var UserIsLocked = isLockedResponse.Content.ReadAsAsync<bool>().Result;
+            return UserIsLocked;
+        }
     }
 
     public class AuthenticationService
@@ -146,7 +155,7 @@ namespace DependencyInjectionWorkshop.Models
 
         public bool Verify(string userAccount, string password, string otp)
         {
-            var UserIsLocked = GetUserLockedStatus(userAccount);
+            var UserIsLocked = _failedCounter.GetUserLockedStatus(userAccount);
             if (UserIsLocked)
             {
                 throw new FailedTooManyTimesException();
@@ -174,15 +183,6 @@ namespace DependencyInjectionWorkshop.Models
             }
 
             return false;
-        }
-
-        private static bool GetUserLockedStatus(string userAccount)
-        {
-            var isLockedResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/IsLocked", userAccount).Result;
-
-            isLockedResponse.EnsureSuccessStatusCode();
-            var UserIsLocked = isLockedResponse.Content.ReadAsAsync<bool>().Result;
-            return UserIsLocked;
         }
     }
 
