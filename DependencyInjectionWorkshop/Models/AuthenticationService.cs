@@ -17,10 +17,8 @@ namespace DependencyInjectionWorkshop.Models
 
             #region 驗證是否被鎖
 
-            var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsLocked", userAccount).Result;
-
-            isLockedResponse.EnsureSuccessStatusCode();
-            if (isLockedResponse.Content.ReadAsAsync<bool>().Result)
+            var UserIsLocked = GetUserLockedStatus(userAccount, httpClient);
+            if (UserIsLocked)
             {
                 throw new FailedTooManyTimesException();
             }
@@ -29,24 +27,13 @@ namespace DependencyInjectionWorkshop.Models
 
             #region Get Psw
 
-            string passwordfordb;
-            using (var connection = new SqlConnection("my connection string"))
-            {
-                passwordfordb = connection.Query<string>("spGetUserPassword", new { Id = userAccount },
-                    commandType: CommandType.StoredProcedure).SingleOrDefault();
-            }
+            var passwordfordb = GetPasswordFormDB(userAccount);
 
             #endregion Get Psw
 
             #region Get hash
 
-            var crypt = new System.Security.Cryptography.SHA256Managed();
-            var hash = new StringBuilder();
-            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(psw));
-            foreach (var theByte in crypto)
-            {
-                hash.Append(theByte.ToString("x2"));
-            }
+            var hash = GetHashedPassword(psw);
             string hashedPsw = hash.ToString();
 
             #endregion Get hash
@@ -106,6 +93,40 @@ namespace DependencyInjectionWorkshop.Models
             }
 
             return false;
+        }
+
+        private static StringBuilder GetHashedPassword(string psw)
+        {
+            var crypt = new System.Security.Cryptography.SHA256Managed();
+            var hash = new StringBuilder();
+            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(psw));
+            foreach (var theByte in crypto)
+            {
+                hash.Append(theByte.ToString("x2"));
+            }
+
+            return hash;
+        }
+
+        private static bool GetUserLockedStatus(string userAccount, HttpClient httpClient)
+        {
+            var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsLocked", userAccount).Result;
+
+            isLockedResponse.EnsureSuccessStatusCode();
+            var UserIsLocked = isLockedResponse.Content.ReadAsAsync<bool>().Result;
+            return UserIsLocked;
+        }
+
+        private static string GetPasswordFormDB(string userAccount)
+        {
+            string passwordfordb;
+            using (var connection = new SqlConnection("my connection string"))
+            {
+                passwordfordb = connection.Query<string>("spGetUserPassword", new {Id = userAccount},
+                    commandType: CommandType.StoredProcedure).SingleOrDefault();
+            }
+
+            return passwordfordb;
         }
     }
 
