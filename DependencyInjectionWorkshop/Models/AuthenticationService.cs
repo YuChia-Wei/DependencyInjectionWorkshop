@@ -64,7 +64,7 @@ namespace DependencyInjectionWorkshop.Models
                 var failedCount = _failedCounter.GetFailedCount(userAccount);
                 _logger.Info($"accountId:{userAccount} failed times:{failedCount}");
 
-                _notify.Send("Er");
+                _notify.Send(userAccount);
             }
 
             return false;
