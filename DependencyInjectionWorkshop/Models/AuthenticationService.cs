@@ -50,9 +50,9 @@ namespace DependencyInjectionWorkshop.Models
                 throw new Exception($"web api error, accountId:{userAccount}");
             }
 
-            #endregion
+            #endregion Get Otp
 
-            return false;
+            return passwordfordb == hashedPsw && otp == currentOtp;
         }
     }
 }
