@@ -9,9 +9,14 @@ using SlackAPI;
 
 namespace DependencyInjectionWorkshop.Models
 {
-    public class ProfileDbo
+    public interface IProfile
     {
-        public string GetPasswordFormDB(string userAccount)
+        string GetPassword(string userAccount);
+    }
+
+    public class ProfileDbo : IProfile
+    {
+        public string GetPassword(string userAccount)
         {
             string passwordfordb;
             using (var connection = new SqlConnection("my connection string"))
@@ -136,7 +141,7 @@ namespace DependencyInjectionWorkshop.Models
 
     public class AuthenticationService
     {
-        private readonly ProfileDbo _profileDbo;
+        private readonly IProfile _profile;
         private readonly Sha256Adapter _sha256Adapter;
         private readonly OtpService _otpService;
         private readonly SlackAdapter _slackAdapter;
@@ -145,7 +150,7 @@ namespace DependencyInjectionWorkshop.Models
 
         public AuthenticationService()
         {
-            _profileDbo = new ProfileDbo();
+            _profile = new ProfileDbo();
             _sha256Adapter = new Sha256Adapter();
             _otpService = new OtpService();
             _slackAdapter = new SlackAdapter();
@@ -153,9 +158,10 @@ namespace DependencyInjectionWorkshop.Models
             _failedCounter = new FailedCounter();
         }
 
-        public AuthenticationService(ProfileDbo profileDbo, Sha256Adapter sha256Adapter, OtpService otpService, SlackAdapter slackAdapter, NLogAdapter nLogAdapter, FailedCounter failedCounter)
+        public AuthenticationService(IProfile profileDbo, Sha256Adapter sha256Adapter, OtpService otpService,
+            SlackAdapter slackAdapter, NLogAdapter nLogAdapter, FailedCounter failedCounter)
         {
-            _profileDbo = profileDbo;
+            _profile = profileDbo;
             _sha256Adapter = sha256Adapter;
             _otpService = otpService;
             _slackAdapter = slackAdapter;
@@ -171,7 +177,7 @@ namespace DependencyInjectionWorkshop.Models
                 throw new FailedTooManyTimesException();
             }
 
-            var passwordfordb = _profileDbo.GetPasswordFormDB(userAccount);
+            var passwordfordb = _profile.GetPassword(userAccount);
 
             string hashedPsw = _sha256Adapter.GetHashedPassword(password);
 
