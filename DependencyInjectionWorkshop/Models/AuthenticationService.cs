@@ -67,17 +67,32 @@ namespace DependencyInjectionWorkshop.Models
         }
     }
 
+    public class SlackAdapter
+    {
+        public SlackAdapter()
+        {
+        }
+
+        public void NotifyToSlack(string messageText)
+        {
+            var slackClient = new SlackClient("my api token");
+            slackClient.PostMessage(response1 => { }, "my channel", messageText, "my bot name");
+        }
+    }
+
     public class AuthenticationService
     {
         private readonly ProfileDbo _profileDbo;
         private readonly Sha256Adapter _sha256Adapter;
         private readonly OtpService _otpService;
+        private readonly SlackAdapter _slackAdapter;
 
         public AuthenticationService()
         {
             _profileDbo = new ProfileDbo();
             _sha256Adapter = new Sha256Adapter();
             _otpService = new OtpService();
+            _slackAdapter = new SlackAdapter();
         }
 
         public bool Verify(string userAccount, string psw, string otp)
@@ -108,16 +123,10 @@ namespace DependencyInjectionWorkshop.Models
                 var failedCount = GetFailedCount(userAccount, httpClient);
                 LogMessage(userAccount, failedCount);
 
-                NotifyToSlack("Er");
+                _slackAdapter.NotifyToSlack("Er");
             }
 
             return false;
-        }
-
-        private void NotifyToSlack(string messageText)
-        {
-            var slackClient = new SlackClient("my api token");
-            slackClient.PostMessage(response1 => { }, "my channel", messageText, "my bot name");
         }
 
         private void LogMessage(string userAccount, int failedCount)
