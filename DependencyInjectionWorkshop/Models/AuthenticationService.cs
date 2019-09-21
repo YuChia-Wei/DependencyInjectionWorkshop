@@ -153,6 +153,16 @@ namespace DependencyInjectionWorkshop.Models
             _failedCounter = new FailedCounter();
         }
 
+        public AuthenticationService(ProfileDbo profileDbo, Sha256Adapter sha256Adapter, OtpService otpService, SlackAdapter slackAdapter, NLogAdapter nLogAdapter, FailedCounter failedCounter)
+        {
+            _profileDbo = profileDbo;
+            _sha256Adapter = sha256Adapter;
+            _otpService = otpService;
+            _slackAdapter = slackAdapter;
+            _nLogAdapter = nLogAdapter;
+            _failedCounter = failedCounter;
+        }
+
         public bool Verify(string userAccount, string password, string otp)
         {
             var UserIsLocked = _failedCounter.GetUserLockedStatus(userAccount);
@@ -177,7 +187,7 @@ namespace DependencyInjectionWorkshop.Models
                 _failedCounter.AddFailedCount(userAccount);
 
                 var failedCount = _failedCounter.GetFailedCount(userAccount);
-                _nLogAdapter.LogMessage( $"accountId:{userAccount} failed times:{failedCount}");
+                _nLogAdapter.LogMessage($"accountId:{userAccount} failed times:{failedCount}");
 
                 _slackAdapter.NotifyToSlack("Er");
             }
