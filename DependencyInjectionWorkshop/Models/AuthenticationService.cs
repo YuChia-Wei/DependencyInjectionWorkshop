@@ -14,9 +14,10 @@ namespace DependencyInjectionWorkshop.Models
         {
             #region Get Psw
 
+            string passwordfordb;
             using (var connection = new SqlConnection("my connection string"))
             {
-                var password = connection.Query<string>("spGetUserPassword", new { Id = userAccount },
+                passwordfordb = connection.Query<string>("spGetUserPassword", new { Id = userAccount },
                     commandType: CommandType.StoredProcedure).SingleOrDefault();
             }
 
