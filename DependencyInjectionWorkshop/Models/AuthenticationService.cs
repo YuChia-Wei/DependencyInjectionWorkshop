@@ -86,10 +86,10 @@ namespace DependencyInjectionWorkshop.Models
         {
         }
 
-        public void LogMessage(string userAccount, int failedCount)
+        public void LogMessage(string s)
         {
             var logger = NLog.LogManager.GetCurrentClassLogger();
-            logger.Info($"accountId:{userAccount} failed times:{failedCount}");
+            logger.Info(s);
         }
     }
 
@@ -177,7 +177,7 @@ namespace DependencyInjectionWorkshop.Models
                 _failedCounter.AddFailedCount(userAccount);
 
                 var failedCount = _failedCounter.GetFailedCount(userAccount);
-                _nLogAdapter.LogMessage(userAccount, failedCount);
+                _nLogAdapter.LogMessage( $"accountId:{userAccount} failed times:{failedCount}");
 
                 _slackAdapter.NotifyToSlack("Er");
             }
