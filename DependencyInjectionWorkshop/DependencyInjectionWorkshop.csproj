@@ -76,11 +76,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\AuthenticationService.cs" />
+    <Compile Include="Models\FailedCounter\FailedCounter.cs" />
+    <Compile Include="Models\FailedCounter\IFailedCounter.cs" />
+    <Compile Include="Models\Hash\IHash.cs" />
+    <Compile Include="Models\Hash\Sha256Adapter.cs" />
+    <Compile Include="Models\LogService\ILogger.cs" />
+    <Compile Include="Models\LogService\NLogAdapter.cs" />
+    <Compile Include="Models\Notify\INotify.cs" />
+    <Compile Include="Models\Notify\SlackAdapter.cs" />
+    <Compile Include="Models\Otp\IOtpService.cs" />
+    <Compile Include="Models\Otp\OtpService.cs" />
+    <Compile Include="Models\Profile\IProfile.cs" />
+    <Compile Include="Models\Profile\ProfileDbo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
