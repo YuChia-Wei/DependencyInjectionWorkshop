@@ -24,9 +24,36 @@ namespace DependencyInjectionWorkshop.Models
         }
     }
 
+    public class Sha256Adapter
+    {
+        public Sha256Adapter()
+        {
+        }
+
+        public string GetHashedPassword(string psw)
+        {
+            var crypt = new System.Security.Cryptography.SHA256Managed();
+            var hash = new StringBuilder();
+            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(psw));
+            foreach (var theByte in crypto)
+            {
+                hash.Append(theByte.ToString("x2"));
+            }
+
+            return hash.ToString();
+        }
+    }
+
     public class AuthenticationService
     {
-        private readonly ProfileDbo _profileDbo = new ProfileDbo();
+        private readonly ProfileDbo _profileDbo;
+        private readonly Sha256Adapter _sha256Adapter;
+
+        public AuthenticationService()
+        {
+            _profileDbo = new ProfileDbo();
+            _sha256Adapter = new Sha256Adapter();
+        }
 
         public bool Verify(string userAccount, string psw, string otp)
         {
@@ -40,8 +67,7 @@ namespace DependencyInjectionWorkshop.Models
 
             var passwordfordb = _profileDbo.GetPasswordFormDB(userAccount);
 
-            var hash = GetHashedPassword(psw);
-            string hashedPsw = hash.ToString();
+            string hashedPsw = _sha256Adapter.GetHashedPassword(psw);
 
             var currentOtp = GetCurrentOtp(userAccount, httpClient);
 
@@ -114,19 +140,6 @@ namespace DependencyInjectionWorkshop.Models
             var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/Reset", userAccount).Result;
 
             resetResponse.EnsureSuccessStatusCode();
-        }
-
-        private StringBuilder GetHashedPassword(string psw)
-        {
-            var crypt = new System.Security.Cryptography.SHA256Managed();
-            var hash = new StringBuilder();
-            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(psw));
-            foreach (var theByte in crypto)
-            {
-                hash.Append(theByte.ToString("x2"));
-            }
-
-            return hash;
         }
 
         private static bool GetUserLockedStatus(string userAccount, HttpClient httpClient)
