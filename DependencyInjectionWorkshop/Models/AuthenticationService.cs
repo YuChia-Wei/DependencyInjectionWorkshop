@@ -13,6 +13,20 @@ namespace DependencyInjectionWorkshop.Models
     {
         public bool Verify(string userAccount, string psw, string otp)
         {
+            var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
+
+            #region 驗證是否被鎖
+
+            var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsLocked", userAccount).Result;
+
+            isLockedResponse.EnsureSuccessStatusCode();
+            if (isLockedResponse.Content.ReadAsAsync<bool>().Result)
+            {
+                throw new FailedTooManyTimesException();
+            }
+
+            #endregion 驗證是否被鎖
+
             #region Get Psw
 
             string passwordfordb;
@@ -40,7 +54,6 @@ namespace DependencyInjectionWorkshop.Models
             #region Get Otp
 
             string currentOtp;
-            var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
             var response = httpClient.PostAsJsonAsync("api/otps", userAccount).Result;
             if (response.IsSuccessStatusCode)
             {
@@ -81,5 +94,9 @@ namespace DependencyInjectionWorkshop.Models
 
             return false;
         }
+    }
+
+    public class FailedTooManyTimesException : Exception
+    {
     }
 }
