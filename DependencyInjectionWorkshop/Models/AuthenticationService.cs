@@ -9,8 +9,25 @@ using SlackAPI;
 
 namespace DependencyInjectionWorkshop.Models
 {
+    public class ProfileDbo
+    {
+        public string GetPasswordFormDB(string userAccount)
+        {
+            string passwordfordb;
+            using (var connection = new SqlConnection("my connection string"))
+            {
+                passwordfordb = connection.Query<string>("spGetUserPassword", new { Id = userAccount },
+                    commandType: CommandType.StoredProcedure).SingleOrDefault();
+            }
+
+            return passwordfordb;
+        }
+    }
+
     public class AuthenticationService
     {
+        private readonly ProfileDbo _profileDbo = new ProfileDbo();
+
         public bool Verify(string userAccount, string psw, string otp)
         {
             var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
@@ -21,7 +38,7 @@ namespace DependencyInjectionWorkshop.Models
                 throw new FailedTooManyTimesException();
             }
 
-            var passwordfordb = GetPasswordFormDB(userAccount);
+            var passwordfordb = _profileDbo.GetPasswordFormDB(userAccount);
 
             var hash = GetHashedPassword(psw);
             string hashedPsw = hash.ToString();
@@ -46,13 +63,19 @@ namespace DependencyInjectionWorkshop.Models
             return false;
         }
 
-        private static void NotifyToSlack(string messageText)
+        private void NotifyToSlack(string messageText)
         {
             var slackClient = new SlackClient("my api token");
             slackClient.PostMessage(response1 => { }, "my channel", messageText, "my bot name");
         }
 
-        private static string GetCurrentOtp(string userAccount, HttpClient httpClient)
+        private void LogMessage(string userAccount, int failedCount)
+        {
+            var logger = NLog.LogManager.GetCurrentClassLogger();
+            logger.Info($"accountId:{userAccount} failed times:{failedCount}");
+        }
+
+        private string GetCurrentOtp(string userAccount, HttpClient httpClient)
         {
             string currentOtp;
             var response = httpClient.PostAsJsonAsync("api/otps", userAccount).Result;
@@ -68,13 +91,7 @@ namespace DependencyInjectionWorkshop.Models
             return currentOtp;
         }
 
-        private static void LogMessage(string userAccount, int failedCount)
-        {
-            var logger = NLog.LogManager.GetCurrentClassLogger();
-            logger.Info($"accountId:{userAccount} failed times:{failedCount}");
-        }
-
-        private static int GetFailedCount(string userAccount, HttpClient httpClient)
+        private int GetFailedCount(string userAccount, HttpClient httpClient)
         {
             var failedCountResponse =
                 httpClient.PostAsJsonAsync("api/failedCounter/GetFailedCount", userAccount).Result;
@@ -85,21 +102,21 @@ namespace DependencyInjectionWorkshop.Models
             return failedCount;
         }
 
-        private static void AddFailedCount(string userAccount, HttpClient httpClient)
+        private void AddFailedCount(string userAccount, HttpClient httpClient)
         {
             var addFailedCountResponse = httpClient.PostAsJsonAsync("api/failedCounter/Add", userAccount).Result;
 
             addFailedCountResponse.EnsureSuccessStatusCode();
         }
 
-        private static void ResetFailedCount(string userAccount, HttpClient httpClient)
+        private void ResetFailedCount(string userAccount, HttpClient httpClient)
         {
             var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/Reset", userAccount).Result;
 
             resetResponse.EnsureSuccessStatusCode();
         }
 
-        private static StringBuilder GetHashedPassword(string psw)
+        private StringBuilder GetHashedPassword(string psw)
         {
             var crypt = new System.Security.Cryptography.SHA256Managed();
             var hash = new StringBuilder();
@@ -119,18 +136,6 @@ namespace DependencyInjectionWorkshop.Models
             isLockedResponse.EnsureSuccessStatusCode();
             var UserIsLocked = isLockedResponse.Content.ReadAsAsync<bool>().Result;
             return UserIsLocked;
-        }
-
-        private static string GetPasswordFormDB(string userAccount)
-        {
-            string passwordfordb;
-            using (var connection = new SqlConnection("my connection string"))
-            {
-                passwordfordb = connection.Query<string>("spGetUserPassword", new { Id = userAccount },
-                    commandType: CommandType.StoredProcedure).SingleOrDefault();
-            }
-
-            return passwordfordb;
         }
     }
 
