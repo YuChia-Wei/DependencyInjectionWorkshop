@@ -88,6 +88,19 @@ namespace DependencyInjectionWorkshop.Models
 
                 #endregion 驗證失敗要紀錄失敗次數
 
+                #region 用 NLog 紀錄失敗訊息
+
+                var failedCountResponse =
+                    httpClient.PostAsJsonAsync("api/failedCounter/GetFailedCount", userAccount).Result;
+
+                failedCountResponse.EnsureSuccessStatusCode();
+
+                var failedCount = failedCountResponse.Content.ReadAsAsync<int>().Result;
+                var logger = NLog.LogManager.GetCurrentClassLogger();
+                logger.Info($"accountId:{userAccount} failed times:{failedCount}");
+
+                #endregion 用 NLog 紀錄失敗訊息
+
                 var slackClient = new SlackClient("my api token");
                 slackClient.PostMessage(response1 => { }, "my channel", "ERR", "my bot name");
             }
