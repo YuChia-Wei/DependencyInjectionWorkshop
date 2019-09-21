@@ -50,6 +50,23 @@ namespace DependencyInjectionWorkshopTests
             ShouldBeValid(isValid);
         }
 
+        [Test]
+        public void is_invalid()
+        {
+            GivenPassword(DefaultAccountId, DefaultHashedPassword);
+            GivenHash(DefaultInputPassword, DefaultHashedPassword);
+            GivenOtp(DefaultAccountId, DefaultOtp);
+
+            var isValid = WhenVerify(DefaultAccountId, DefaultInputPassword, "123");
+
+            ShouldBeInvalid(isValid);
+        }
+
+        private static void ShouldBeInvalid(bool isValid)
+        {
+            Assert.IsFalse(isValid);
+        }
+
         private static void ShouldBeValid(bool isValid)
         {
             Assert.IsTrue(isValid);
