@@ -44,15 +44,40 @@ namespace DependencyInjectionWorkshop.Models
         }
     }
 
+    public class OtpService
+    {
+        public OtpService()
+        {
+        }
+
+        public string GetCurrentOtp(string userAccount, HttpClient httpClient)
+        {
+            string currentOtp;
+            var response = httpClient.PostAsJsonAsync("api/otps", userAccount).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                currentOtp = response.Content.ReadAsAsync<string>().Result;
+            }
+            else
+            {
+                throw new Exception($"web api error, accountId:{userAccount}");
+            }
+
+            return currentOtp;
+        }
+    }
+
     public class AuthenticationService
     {
         private readonly ProfileDbo _profileDbo;
         private readonly Sha256Adapter _sha256Adapter;
+        private readonly OtpService _otpService;
 
         public AuthenticationService()
         {
             _profileDbo = new ProfileDbo();
             _sha256Adapter = new Sha256Adapter();
+            _otpService = new OtpService();
         }
 
         public bool Verify(string userAccount, string psw, string otp)
@@ -69,7 +94,7 @@ namespace DependencyInjectionWorkshop.Models
 
             string hashedPsw = _sha256Adapter.GetHashedPassword(psw);
 
-            var currentOtp = GetCurrentOtp(userAccount, httpClient);
+            var currentOtp = _otpService.GetCurrentOtp(userAccount, httpClient);
 
             if (passwordfordb == hashedPsw && otp == currentOtp)
             {
@@ -99,22 +124,6 @@ namespace DependencyInjectionWorkshop.Models
         {
             var logger = NLog.LogManager.GetCurrentClassLogger();
             logger.Info($"accountId:{userAccount} failed times:{failedCount}");
-        }
-
-        private string GetCurrentOtp(string userAccount, HttpClient httpClient)
-        {
-            string currentOtp;
-            var response = httpClient.PostAsJsonAsync("api/otps", userAccount).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                currentOtp = response.Content.ReadAsAsync<string>().Result;
-            }
-            else
-            {
-                throw new Exception($"web api error, accountId:{userAccount}");
-            }
-
-            return currentOtp;
         }
 
         private int GetFailedCount(string userAccount, HttpClient httpClient)
