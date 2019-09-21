@@ -68,12 +68,7 @@ namespace DependencyInjectionWorkshop.Models
 
                 #region 用 NLog 紀錄失敗訊息
 
-                var failedCountResponse =
-                    httpClient.PostAsJsonAsync("api/failedCounter/GetFailedCount", userAccount).Result;
-
-                failedCountResponse.EnsureSuccessStatusCode();
-
-                var failedCount = failedCountResponse.Content.ReadAsAsync<int>().Result;
+                var failedCount = GetFailedCount(userAccount, httpClient);
                 var logger = NLog.LogManager.GetCurrentClassLogger();
                 logger.Info($"accountId:{userAccount} failed times:{failedCount}");
 
@@ -84,6 +79,17 @@ namespace DependencyInjectionWorkshop.Models
             }
 
             return false;
+        }
+
+        private static int GetFailedCount(string userAccount, HttpClient httpClient)
+        {
+            var failedCountResponse =
+                httpClient.PostAsJsonAsync("api/failedCounter/GetFailedCount", userAccount).Result;
+
+            failedCountResponse.EnsureSuccessStatusCode();
+
+            var failedCount = failedCountResponse.Content.ReadAsAsync<int>().Result;
+            return failedCount;
         }
 
         private static void AddErrCount(string userAccount, HttpClient httpClient)
