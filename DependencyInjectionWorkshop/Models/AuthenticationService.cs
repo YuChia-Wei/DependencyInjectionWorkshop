@@ -69,8 +69,7 @@ namespace DependencyInjectionWorkshop.Models
                 #region 用 NLog 紀錄失敗訊息
 
                 var failedCount = GetFailedCount(userAccount, httpClient);
-                var logger = NLog.LogManager.GetCurrentClassLogger();
-                logger.Info($"accountId:{userAccount} failed times:{failedCount}");
+                LogMessage(userAccount, failedCount);
 
                 #endregion 用 NLog 紀錄失敗訊息
 
@@ -79,6 +78,12 @@ namespace DependencyInjectionWorkshop.Models
             }
 
             return false;
+        }
+
+        private static void LogMessage(string userAccount, int failedCount)
+        {
+            var logger = NLog.LogManager.GetCurrentClassLogger();
+            logger.Info($"accountId:{userAccount} failed times:{failedCount}");
         }
 
         private static int GetFailedCount(string userAccount, HttpClient httpClient)
