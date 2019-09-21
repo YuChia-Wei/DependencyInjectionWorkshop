@@ -55,7 +55,7 @@ namespace DependencyInjectionWorkshop.Models
 
             if (passwordfordb == hashedPsw && otp == currentOtp)
             {
-                ResetErrCount(userAccount, httpClient);
+                ResetFailedCount(userAccount, httpClient);
                 return true;
             }
             else
@@ -99,7 +99,7 @@ namespace DependencyInjectionWorkshop.Models
             addFailedCountResponse.EnsureSuccessStatusCode();
         }
 
-        private static void ResetErrCount(string userAccount, HttpClient httpClient)
+        private static void ResetFailedCount(string userAccount, HttpClient httpClient)
         {
             var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/Reset", userAccount).Result;
 
