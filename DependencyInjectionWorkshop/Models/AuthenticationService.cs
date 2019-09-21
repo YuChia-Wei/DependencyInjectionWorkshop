@@ -55,14 +55,7 @@ namespace DependencyInjectionWorkshop.Models
 
             if (passwordfordb == hashedPsw && otp == currentOtp)
             {
-                #region 驗證成功要重設失敗次數
-
-                var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/Reset", userAccount).Result;
-
-                resetResponse.EnsureSuccessStatusCode();
-
-                #endregion 驗證成功要重設失敗次數
-
+                ResetErrCount(userAccount, httpClient);
                 return true;
             }
             else
@@ -93,6 +86,13 @@ namespace DependencyInjectionWorkshop.Models
             }
 
             return false;
+        }
+
+        private static void ResetErrCount(string userAccount, HttpClient httpClient)
+        {
+            var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/Reset", userAccount).Result;
+
+            resetResponse.EnsureSuccessStatusCode();
         }
 
         private static StringBuilder GetHashedPassword(string psw)
