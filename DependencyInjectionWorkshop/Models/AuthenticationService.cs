@@ -62,7 +62,7 @@ namespace DependencyInjectionWorkshop.Models
             {
                 #region 驗證失敗要紀錄失敗次數
 
-                AddErrCount(userAccount, httpClient);
+                AddFailedCount(userAccount, httpClient);
 
                 #endregion 驗證失敗要紀錄失敗次數
 
@@ -92,7 +92,7 @@ namespace DependencyInjectionWorkshop.Models
             return failedCount;
         }
 
-        private static void AddErrCount(string userAccount, HttpClient httpClient)
+        private static void AddFailedCount(string userAccount, HttpClient httpClient)
         {
             var addFailedCountResponse = httpClient.PostAsJsonAsync("api/failedCounter/Add", userAccount).Result;
 
