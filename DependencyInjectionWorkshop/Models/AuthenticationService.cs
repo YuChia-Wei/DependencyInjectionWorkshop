@@ -15,34 +15,18 @@ namespace DependencyInjectionWorkshop.Models
         {
             var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
 
-            #region 驗證是否被鎖
-
             var UserIsLocked = GetUserLockedStatus(userAccount, httpClient);
             if (UserIsLocked)
             {
                 throw new FailedTooManyTimesException();
             }
 
-            #endregion 驗證是否被鎖
-
-            #region Get Psw
-
             var passwordfordb = GetPasswordFormDB(userAccount);
-
-            #endregion Get Psw
-
-            #region Get hash
 
             var hash = GetHashedPassword(psw);
             string hashedPsw = hash.ToString();
 
-            #endregion Get hash
-
-            #region Get Otp
-
             var currentOtp = GetCurrentOtp(userAccount, httpClient);
-
-            #endregion Get Otp
 
             if (passwordfordb == hashedPsw && otp == currentOtp)
             {
@@ -51,18 +35,10 @@ namespace DependencyInjectionWorkshop.Models
             }
             else
             {
-                #region 驗證失敗要紀錄失敗次數
-
                 AddFailedCount(userAccount, httpClient);
-
-                #endregion 驗證失敗要紀錄失敗次數
-
-                #region 用 NLog 紀錄失敗訊息
 
                 var failedCount = GetFailedCount(userAccount, httpClient);
                 LogMessage(userAccount, failedCount);
-
-                #endregion 用 NLog 紀錄失敗訊息
 
                 NotifyToSlack("Er");
             }
