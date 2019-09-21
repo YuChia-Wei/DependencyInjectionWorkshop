@@ -1,6 +1,6 @@
 ﻿namespace DependencyInjectionWorkshop.Models.Notify
 {
-    public interface INotify
+    public interface INotification
     {
         void Post(string messageText);
     }

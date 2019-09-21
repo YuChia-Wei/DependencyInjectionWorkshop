@@ -8,7 +8,7 @@ namespace DependencyInjectionWorkshop.Models.Hash
         {
         }
 
-        public string Hash(string psw)
+        public string Compute(string psw)
         {
             var crypt = new System.Security.Cryptography.SHA256Managed();
             var hash = new StringBuilder();

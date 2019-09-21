@@ -13,7 +13,7 @@ namespace DependencyInjectionWorkshop.Models
         private readonly IProfile _profile;
         private readonly IHash _hash;
         private readonly IOtpService _otpService;
-        private readonly INotify _notify;
+        private readonly INotification _notify;
         private readonly ILogger _logger;
         private readonly IFailedCounter _failedCounter;
 
@@ -27,13 +27,13 @@ namespace DependencyInjectionWorkshop.Models
             _failedCounter = new FailedCounter.FailedCounter();
         }
 
-        public AuthenticationService(IProfile profileDbo, IHash hash, IOtpService otpService,
-            INotify notify, ILogger logger, IFailedCounter failedCounter)
+        public AuthenticationService(IFailedCounter failedCounter, ILogger logger, IOtpService otpService,
+            IProfile profile, IHash hash, INotification notification)
         {
-            _profile = profileDbo;
+            _profile = profile;
             _hash = hash;
             _otpService = otpService;
-            _notify = notify;
+            _notify = notification;
             _logger = logger;
             _failedCounter = failedCounter;
         }
@@ -48,7 +48,7 @@ namespace DependencyInjectionWorkshop.Models
 
             var passwordfordb = _profile.GetPassword(userAccount);
 
-            string hashedPsw = _hash.Hash(password);
+            string hashedPsw = _hash.Compute(password);
 
             var currentOtp = _otpService.GetCurrentOtp(userAccount);
 

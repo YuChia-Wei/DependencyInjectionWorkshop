@@ -2,6 +2,6 @@
 {
     public interface IHash
     {
-        string Hash(string psw);
+        string Compute(string psw);
     }
 }
