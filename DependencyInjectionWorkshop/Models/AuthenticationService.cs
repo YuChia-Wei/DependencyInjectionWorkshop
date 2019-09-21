@@ -40,16 +40,7 @@ namespace DependencyInjectionWorkshop.Models
 
             #region Get Otp
 
-            string currentOtp;
-            var response = httpClient.PostAsJsonAsync("api/otps", userAccount).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                currentOtp = response.Content.ReadAsAsync<string>().Result;
-            }
-            else
-            {
-                throw new Exception($"web api error, accountId:{userAccount}");
-            }
+            var currentOtp = GetCurrentOtp(userAccount, httpClient);
 
             #endregion Get Otp
 
@@ -78,6 +69,22 @@ namespace DependencyInjectionWorkshop.Models
             }
 
             return false;
+        }
+
+        private static string GetCurrentOtp(string userAccount, HttpClient httpClient)
+        {
+            string currentOtp;
+            var response = httpClient.PostAsJsonAsync("api/otps", userAccount).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                currentOtp = response.Content.ReadAsAsync<string>().Result;
+            }
+            else
+            {
+                throw new Exception($"web api error, accountId:{userAccount}");
+            }
+
+            return currentOtp;
         }
 
         private static void LogMessage(string userAccount, int failedCount)
