@@ -55,10 +55,26 @@ namespace DependencyInjectionWorkshop.Models
 
             if (passwordfordb == hashedPsw && otp == currentOtp)
             {
+                #region 驗證成功要重設失敗次數
+
+                var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/Reset", userAccount).Result;
+
+                resetResponse.EnsureSuccessStatusCode();
+
+                #endregion 驗證成功要重設失敗次數
+
                 return true;
             }
             else
             {
+                #region 驗證失敗要紀錄失敗次數
+
+                var addFailedCountResponse = httpClient.PostAsJsonAsync("api/failedCounter/Add", userAccount).Result;
+
+                addFailedCountResponse.EnsureSuccessStatusCode();
+
+                #endregion 驗證失敗要紀錄失敗次數
+
                 var slackClient = new SlackClient("my api token");
                 slackClient.PostMessage(response1 => { }, "my channel", "ERR", "my bot name");
             }
