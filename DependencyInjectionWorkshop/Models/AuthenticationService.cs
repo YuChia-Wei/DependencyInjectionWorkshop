@@ -64,11 +64,16 @@ namespace DependencyInjectionWorkshop.Models
 
                 #endregion 用 NLog 紀錄失敗訊息
 
-                var slackClient = new SlackClient("my api token");
-                slackClient.PostMessage(response1 => { }, "my channel", "ERR", "my bot name");
+                NotifyToSlack("Er");
             }
 
             return false;
+        }
+
+        private static void NotifyToSlack(string messageText)
+        {
+            var slackClient = new SlackClient("my api token");
+            slackClient.PostMessage(response1 => { }, "my channel", messageText, "my bot name");
         }
 
         private static string GetCurrentOtp(string userAccount, HttpClient httpClient)
@@ -145,7 +150,7 @@ namespace DependencyInjectionWorkshop.Models
             string passwordfordb;
             using (var connection = new SqlConnection("my connection string"))
             {
-                passwordfordb = connection.Query<string>("spGetUserPassword", new {Id = userAccount},
+                passwordfordb = connection.Query<string>("spGetUserPassword", new { Id = userAccount },
                     commandType: CommandType.StoredProcedure).SingleOrDefault();
             }
 
