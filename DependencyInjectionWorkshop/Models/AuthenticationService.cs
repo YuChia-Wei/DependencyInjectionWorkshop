@@ -38,12 +38,12 @@ namespace DependencyInjectionWorkshop.Models
 
             #region Get Otp
 
-            string otpResult;
+            string currentOtp;
             var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
             var response = httpClient.PostAsJsonAsync("api/otps", userAccount).Result;
             if (response.IsSuccessStatusCode)
             {
-                otpResult = response.Content.ReadAsAsync<string>().Result;
+                currentOtp = response.Content.ReadAsAsync<string>().Result;
             }
             else
             {
