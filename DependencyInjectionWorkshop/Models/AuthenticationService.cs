@@ -1,4 +1,5 @@
 ﻿using System;
+using DependencyInjectionWorkshop.Models.Decorator;
 using DependencyInjectionWorkshop.Models.FailedCounter;
 using DependencyInjectionWorkshop.Models.Hash;
 using DependencyInjectionWorkshop.Models.LogService;
@@ -14,9 +15,11 @@ namespace DependencyInjectionWorkshop.Models
         private readonly IOtpService _otpService;
         private readonly ILogger _logger;
         private readonly IFailedCounter _failedCounter;
+        private readonly FailedCounterDecorator _failedCounterDecorator;
 
         public AuthenticationService()
         {
+            //_failedCounterDecorator = new FailedCounterDecorator(this);
             _profile = new ProfileDbo();
             _hash = new Sha256Adapter();
             _otpService = new OtpService();
@@ -27,6 +30,7 @@ namespace DependencyInjectionWorkshop.Models
         public AuthenticationService(IFailedCounter failedCounter, ILogger logger, IOtpService otpService,
             IProfile profile, IHash hash)
         {
+            //_failedCounterDecorator = new FailedCounterDecorator(this);
             _profile = profile;
             _hash = hash;
             _otpService = otpService;
@@ -50,7 +54,6 @@ namespace DependencyInjectionWorkshop.Models
 
             if (passwordfordb == hashedPsw && otp == currentOtp)
             {
-                _failedCounter.ResetFailedCount(userAccount);
                 return true;
             }
             else
