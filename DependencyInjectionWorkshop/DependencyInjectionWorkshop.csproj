@@ -80,6 +80,7 @@
     <Compile Include="Models\FailedCounter\IFailedCounter.cs" />
     <Compile Include="Models\Hash\IHash.cs" />
     <Compile Include="Models\Hash\Sha256Adapter.cs" />
+    <Compile Include="Models\IAuthentication.cs" />
     <Compile Include="Models\LogService\ILogger.cs" />
     <Compile Include="Models\LogService\NLogAdapter.cs" />
     <Compile Include="Models\Notify\INotify.cs" />
