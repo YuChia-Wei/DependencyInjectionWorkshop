@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\AuthenticationService.cs" />
+    <Compile Include="Models\Decorator\AuthenticationBaseDecorator.cs" />
     <Compile Include="Models\Decorator\NotificationDecorator.cs" />
     <Compile Include="Models\FailedCounter\FailedCounter.cs" />
     <Compile Include="Models\FailedCounter\IFailedCounter.cs" />
