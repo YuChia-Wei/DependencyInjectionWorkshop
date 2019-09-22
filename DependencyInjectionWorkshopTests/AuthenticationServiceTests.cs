@@ -1,5 +1,6 @@
 ﻿using System;
 using DependencyInjectionWorkshop.Models;
+using DependencyInjectionWorkshop.Models.Decorator;
 using DependencyInjectionWorkshop.Models.FailedCounter;
 using DependencyInjectionWorkshop.Models.Hash;
 using DependencyInjectionWorkshop.Models.LogService;
