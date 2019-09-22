@@ -18,6 +18,10 @@ namespace DependencyInjectionWorkshop.Models.Decorator
             {
                 _failedCounter.ResetFailedCount(userAccount);
             }
+            else
+            {
+                _failedCounter.AddFailedCount(userAccount);
+            }
             return validResult;
         }
     }

@@ -58,7 +58,7 @@ namespace DependencyInjectionWorkshop.Models
             }
             else
             {
-                _failedCounter.AddFailedCount(userAccount);
+                //_failedCounterDecorator.AddFailedCount(userAccount);
 
                 var failedCount = _failedCounter.GetFailedCount(userAccount);
                 _logger.Info($"accountId:{userAccount} failed times:{failedCount}");
