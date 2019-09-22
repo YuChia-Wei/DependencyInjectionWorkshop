@@ -13,6 +13,12 @@ namespace DependencyInjectionWorkshop.Models.Decorator
 
         public override bool Verify(string userAccount, string password, string otp)
         {
+            var userIsLocked = _failedCounter.GetAccountIsLocked(userAccount);
+            if (userIsLocked)
+            {
+                throw new FailedTooManyTimesException();
+            }
+
             var validResult = base.Verify(userAccount, password, otp);
             if (validResult)
             {
