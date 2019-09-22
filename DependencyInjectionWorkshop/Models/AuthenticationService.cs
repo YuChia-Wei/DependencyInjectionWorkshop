@@ -1,7 +1,5 @@
 ﻿using System;
-using DependencyInjectionWorkshop.Models.FailedCounter;
 using DependencyInjectionWorkshop.Models.Hash;
-using DependencyInjectionWorkshop.Models.LogService;
 using DependencyInjectionWorkshop.Models.Otp;
 using DependencyInjectionWorkshop.Models.Profile;
 
@@ -20,7 +18,7 @@ namespace DependencyInjectionWorkshop.Models
             _otpService = new OtpService();
         }
 
-        public AuthenticationService(IFailedCounter failedCounter, ILogger logger, IOtpService otpService,
+        public AuthenticationService(IOtpService otpService,
             IProfile profile, IHash hash)
         {
             _profile = profile;
